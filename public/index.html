@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forms Builder</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Forms Builder App</h1>
+        <div id="app">
+            <!-- Content will be dynamically inserted here -->
+        </div>
+    </div>
+
+    <!-- Modal for creating/editing forms -->
+    <div id="formModal" class="modal">
+        <div class="modal-content">
+            <h2 id="formModalTitle">Create New Form</h2>
+            <form id="formModalForm">
+                <label for="formName">Form Name:</label>
+                <input type="text" id="formName" name="formName" required>
+                <button type="submit">Save</button>
+                <button type="button" class="cancel">Cancel</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal for adding/editing fields -->
+    <div id="fieldModal" class="modal">
+        <div class="modal-content">
+            <h2 id="fieldModalTitle">Add New Field</h2>
+            <form id="fieldModalForm">
+                <label for="fieldType">Field Type:</label>
+                <select id="fieldType" name="fieldType" required>
+                    <option value="text">Text</option>
+                    <option value="textarea">Textarea</option>
+                    <option value="radio">Radio</option>
+                    <option value="checkbox">Checkbox</option>
+                    <option value="select">Select</option>
+                    <option value="date">Date</option>
+                </select>
+
+                <label for="fieldLabel">Field Label:</label>
+                <input type="text" id="fieldLabel" name="fieldLabel" required>
+
+                <label for="fieldRequired">
+                    <input type="checkbox" id="fieldRequired" name="fieldRequired">
+                    Required
+                </label>
+
+                <div id="optionsContainer" style="display: none;">
+                    <label for="fieldOptions">Options (comma-separated):</label>
+                    <input type="text" id="fieldOptions" name="fieldOptions">
+                </div>
+
+                <button type="submit">Save Field</button>
+                <button type="button" class="cancel">Cancel</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="/bundle.js"></script>
+</body>
+</html>
