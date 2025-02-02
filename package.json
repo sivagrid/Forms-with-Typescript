@@ -6,7 +6,7 @@
   "scripts": {
     "start": "webpack serve --open",
     "build": "webpack --mode production",
-    "build-dev": "webpack"
+    "vercel-build": "npm run build"
     },
   "keywords": [
     "typescript",
