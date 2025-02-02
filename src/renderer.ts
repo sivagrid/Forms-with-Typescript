@@ -1,6 +1,9 @@
+// This file handles all rendering operations for the form app
 import type { Form, FormField, FormResponse } from "./types"
 
+// Renderer: This is a static class for rendering different views
 export class Renderer {
+  // render the list of all forms
   static renderFormList(
     forms: Form[],
     onEdit: (id: string) => void,
@@ -48,6 +51,7 @@ export class Renderer {
     })
   }
 
+  // render the form builder view
   static renderFormBuilder(
     form: Form,
     onFieldAdd: () => void,
@@ -96,6 +100,7 @@ export class Renderer {
     })
   }
 
+  // render the field in the form builder
   private static renderFieldEditor(field: FormField, index: number, totalFields: number): string {
     let html = `<div class="field-editor">`
     html += `<h3>${field.label} (${field.type})</h3>`
@@ -118,6 +123,7 @@ export class Renderer {
     return html
   }
 
+  // render the form preview
   static renderFormPreview(
     form: Form,
     onSubmit: (formData: FormData) => void,
@@ -151,6 +157,7 @@ export class Renderer {
     })
   }
 
+  // render a field in the form preview
   private static renderPreviewField(field: FormField, value: string | string[] | undefined): string {
     let html = `<div class="preview-field">`
     html += `<label for="${field.id}">${field.label}${field.required ? " *" : ""}</label>`
@@ -202,6 +209,7 @@ export class Renderer {
     }
   }
 
+  // show message to the user
   static showMessage(message: string): void {
     const messageElement = document.createElement("div")
     messageElement.textContent = message
@@ -222,6 +230,7 @@ export class Renderer {
     }, 3000)
   }
 
+  // render the list of responses for specific form
   static renderResponsesList(form: Form, responses: FormResponse[], onBack: () => void): void {
     const appContainer = document.getElementById("app")
     if (!appContainer) return

@@ -1,7 +1,10 @@
+// This file contains the main FormBuilder class that manages the app's logic
+
 import type { Form, FormField, FieldType, FormResponse } from "./types"
 import { StorageManager } from "./storage"
 import { Renderer } from "./renderer"
 
+// FormBuilder, which is a Main Class that handles form creation, adding fields, edition and submission
 class FormBuilder {
   private forms: Form[] = []
   private currentForm: Form | null = null
@@ -11,12 +14,14 @@ class FormBuilder {
     this.init()
   }
 
+  // init function that initialises the app
   private init(): void {
     this.forms = StorageManager.getForms()
     this.setupEventListeners()
     this.renderFormList()
   }
 
+  // handles event listeners for user interactions
   private setupEventListeners(): void {
     document.getElementById("app")?.addEventListener("click", (e) => this.handleAppClick(e))
     document.getElementById("formModalForm")?.addEventListener("submit", (e) => this.handleFormModalSubmit(e))
@@ -36,6 +41,7 @@ class FormBuilder {
     }
   }
 
+  // modal for creating a form
   private showFormModal(form?: Form): void {
     const titleEl = document.getElementById("formModalTitle") as HTMLElement
     const nameInput = document.getElementById("formName") as HTMLInputElement
@@ -45,6 +51,7 @@ class FormBuilder {
     Renderer.showModal("formModal")
   }
 
+  // modal for adding / editing a field
   private showFieldModal(field?: FormField): void {
     const titleEl = document.getElementById("fieldModalTitle") as HTMLElement
     const typeSelect = document.getElementById("fieldType") as HTMLSelectElement
@@ -74,6 +81,7 @@ class FormBuilder {
     optionsContainer.style.display = ["radio", "checkbox", "select"].includes(typeSelect.value) ? "block" : "none"
   }
 
+  // Handle form submission for creaing a form
   private handleFormModalSubmit(e: Event): void {
     e.preventDefault()
     const nameInput = document.getElementById("formName") as HTMLInputElement
@@ -93,6 +101,7 @@ class FormBuilder {
     }
   }
 
+  // Handle form submission for adding/editing a field
   private handleFieldModalSubmit(e: Event): void {
     e.preventDefault()
     const form = e.target as HTMLFormElement
@@ -123,6 +132,7 @@ class FormBuilder {
     this.closeModals()
   }
 
+  // render the list of all forms
   private renderFormList(): void {
     Renderer.renderFormList(
       this.forms,
@@ -133,6 +143,7 @@ class FormBuilder {
     )
   }
 
+  // render the form builder for the current form
   private renderFormBuilder(): void {
     if (!this.currentForm) return
     Renderer.renderFormBuilder(
@@ -157,6 +168,7 @@ class FormBuilder {
     this.renderFormList()
   }
 
+  // handle preview form
   private previewForm(id: string): void {
     const form = this.forms.find((form) => form.id === id)
     if (form) {
@@ -207,6 +219,7 @@ class FormBuilder {
     }
   }
 
+  // Handle form submission from the preview
   private handleFormSubmit(formData: FormData): void {
     if (!this.currentForm) return
 
@@ -230,6 +243,7 @@ class FormBuilder {
     this.previewForm(this.currentForm.id) // Refresh the preview
   }
 
+  // display responses for a specific form
   private viewResponses(formId: string): void {
     const form = this.forms.find((f) => f.id === formId)
     if (!form) return
@@ -238,6 +252,7 @@ class FormBuilder {
     Renderer.renderResponsesList(form, responses, () => this.renderFormList())
   }
 
+  // save the current form
   private saveForm(): void {
     if (this.currentForm) {
       const index = this.forms.findIndex((form) => form.id === this.currentForm!.id)
