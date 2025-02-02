@@ -17,5 +17,5 @@ Used webpack-dev server to up and running the application and to automatically r
 4. Access this url http://localhost:4000 in browser to view the app
 
 ## To build the app, run the below command
-    ```sh
+   ```sh
    npm run build
