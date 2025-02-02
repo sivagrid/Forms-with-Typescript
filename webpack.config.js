@@ -1,7 +1,7 @@
 const path = require("path")
 
 module.exports = {
-  mode: "production", // change this
+  mode: "production",
   entry: "./src/main.ts",
   module: {
     rules: [
@@ -20,13 +20,10 @@ module.exports = {
     path: path.resolve(__dirname, "dist"),
     publicPath: "/",
   },
-  devtool: "source-map",
   devServer: {
     static: {
       directory: path.join(__dirname, "public"),
     },
-    compress: true,
-    port: 4000,
+    historyApiFallback: true,
   },
 }
-

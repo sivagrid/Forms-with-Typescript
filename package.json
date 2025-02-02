@@ -6,8 +6,8 @@
   "scripts": {
     "start": "webpack serve --open",
     "build": "webpack --mode production",
-    "vercel-build": "npm run build"
-    },
+    "vercel-build": "npm run build && cp public/* dist/"
+  },
   "keywords": [
     "typescript",
     "forms"
