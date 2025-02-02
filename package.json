@@ -1,11 +1,12 @@
 {
-  "name": "forms-with-typescript",
+  "name": "typescript-forms-builder",
   "version": "1.0.0",
-  "description": "This is a sample form application developed using plain TypeScript.",
+  "description": "This is a sample form builder application developed using plain TypeScript.",
   "main": "dist/bundle.js",
   "scripts": {
     "start": "webpack serve --open",
-    "build": "webpack"
+    "build": "webpack --mode production",
+    "build-dev": "webpack"
     },
   "keywords": [
     "typescript",
