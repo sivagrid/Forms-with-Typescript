@@ -1,11 +1,12 @@
-import type { Form, FormField } from "./types"
+import type { Form, FormField, FormResponse } from "./types"
 
 export class Renderer {
   static renderFormList(
     forms: Form[],
     onEdit: (id: string) => void,
     onDelete: (id: string) => void,
-    onPreview: (id: string) => void
+    onPreview: (id: string) => void,
+    onViewResponses: (id: string) => void,
   ): void {
     const appContainer = document.getElementById("app")
     if (!appContainer) return
@@ -41,6 +42,9 @@ export class Renderer {
     })
     document.querySelectorAll(".preview-form").forEach((btn) => {
       btn.addEventListener("click", (e) => onPreview((e.target as HTMLElement).dataset.id!))
+    })
+    document.querySelectorAll(".view-responses").forEach((btn) => {
+      btn.addEventListener("click", (e) => onViewResponses((e.target as HTMLElement).dataset.id!))
     })
   }
 
@@ -114,24 +118,29 @@ export class Renderer {
     return html
   }
 
-  static renderFormPreview(form: Form, onSubmit: (formData: FormData) => void, onBack: () => void): void {
+  static renderFormPreview(
+    form: Form,
+    onSubmit: (formData: FormData) => void,
+    onBack: () => void,
+    lastResponse: FormResponse | null,
+  ): void {
     const appContainer = document.getElementById("app")
     if (!appContainer) return
 
     let html = `
-            <h2>Preview: ${form.name}</h2>
-            <button id="backToList">Back to Form List</button>
-            <form id="previewForm">
-        `
+        <h2>Preview: ${form.name}</h2>
+        <button id="backToList">Back to Form List</button>
+        <form id="previewForm">
+    `
 
     form.fields.forEach((field) => {
-      html += this.renderPreviewField(field)
+      html += this.renderPreviewField(field, lastResponse?.data[field.id])
     })
 
     html += `
-                <button type="submit">Submit</button>
-            </form>
-        `
+            <button type="submit">Submit</button>
+        </form>
+    `
 
     appContainer.innerHTML = html
 
@@ -142,34 +151,35 @@ export class Renderer {
     })
   }
 
-  private static renderPreviewField(field: FormField): string {
+  private static renderPreviewField(field: FormField, value: string | string[] | undefined): string {
     let html = `<div class="preview-field">`
     html += `<label for="${field.id}">${field.label}${field.required ? " *" : ""}</label>`
 
     switch (field.type) {
       case "text":
       case "date":
-        html += `<input type="${field.type}" id="${field.id}" name="${field.id}" ${field.required ? "required" : ""}>`
+        html += `<input type="${field.type}" id="${field.id}" name="${field.id}" ${field.required ? "required" : ""} value="${value || ""}">`
         break
       case "textarea":
-        html += `<textarea id="${field.id}" name="${field.id}" ${field.required ? "required" : ""}></textarea>`
+        html += `<textarea id="${field.id}" name="${field.id}" ${field.required ? "required" : ""}>${value || ""}</textarea>`
         break
       case "radio":
       case "checkbox":
         field.options?.forEach((option, index) => {
+          const checked = Array.isArray(value) ? value.includes(option) : value === option
           html += `
-              <div>
-                  <input type="${field.type}" id="${field.id}_${index}" name="${field.id}" value="${option}" ${field.required ? "required" : ""}>
-                  <label for="${field.id}_${index}">${option}</label>
-              </div>
-          `
+                    <div>
+                        <input type="${field.type}" id="${field.id}_${index}" name="${field.id}" value="${option}" ${field.required ? "required" : ""} ${checked ? "checked" : ""}>
+                        <label for="${field.id}_${index}">${option}</label>
+                    </div>
+                `
         })
         break
       case "select":
         html += `<select id="${field.id}" name="${field.id}" ${field.required ? "required" : ""}>`
         html += `<option value="">Select an option</option>`
         field.options?.forEach((option) => {
-          html += `<option value="${option}">${option}</option>`
+          html += `<option value="${option}" ${value === option ? "selected" : ""}>${option}</option>`
         })
         html += `</select>`
         break
@@ -211,4 +221,39 @@ export class Renderer {
       document.body.removeChild(messageElement)
     }, 3000)
   }
+
+  static renderResponsesList(form: Form, responses: FormResponse[], onBack: () => void): void {
+    const appContainer = document.getElementById("app")
+    if (!appContainer) return
+
+    let html = `
+            <h2>Responses for: ${form.name}</h2>
+            <button id="backToList">Back to Form List</button>
+        `
+
+    if (responses.length === 0) {
+      html += "<p>No responses yet.</p>"
+    } else {
+      html += "<table>"
+      html += "<thead><tr>"
+      form.fields.forEach((field) => {
+        html += `<th>${field.label}</th>`
+      })
+      html += "</tr></thead>"
+      html += "<tbody>"
+      responses.forEach((response) => {
+        html += "<tr>"
+        form.fields.forEach((field) => {
+          const value = response.data[field.id]
+          html += `<td>${Array.isArray(value) ? value.join(", ") : value}</td>`
+        })
+        html += "</tr>"
+      })
+      html += "</tbody></table>"
+    }
+
+    appContainer.innerHTML = html
+    document.getElementById("backToList")?.addEventListener("click", onBack)
+  }
 }
+

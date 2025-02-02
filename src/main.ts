@@ -1,4 +1,5 @@
 import type { Form, FormField, FieldType, FormResponse } from "./types"
+import { StorageManager } from "./storage"
 import { Renderer } from "./renderer"
 
 class FormBuilder {
@@ -11,6 +12,7 @@ class FormBuilder {
   }
 
   private init(): void {
+    this.forms = StorageManager.getForms()
     this.setupEventListeners()
     this.renderFormList()
   }
@@ -29,6 +31,8 @@ class FormBuilder {
     const target = e.target as HTMLElement
     if (target.id === "createFormBtn") {
       this.createNewForm()
+    } else if (target.classList.contains("view-responses")) {
+      this.viewResponses(target.dataset.id!)
     }
   }
 
@@ -83,6 +87,7 @@ class FormBuilder {
       }
       this.forms.push(newForm)
       this.currentForm = newForm
+      StorageManager.saveForms(this.forms)
       this.closeModals()
       this.renderFormBuilder()
     }
@@ -123,7 +128,8 @@ class FormBuilder {
       this.forms,
       (id) => this.editForm(id),
       (id) => this.deleteForm(id),
-      (id) => this.previewForm(id)
+      (id) => this.previewForm(id),
+      (id) => this.viewResponses(id),
     )
   }
 
@@ -147,16 +153,19 @@ class FormBuilder {
 
   private deleteForm(id: string): void {
     this.forms = this.forms.filter((form) => form.id !== id)
+    StorageManager.deleteForm(id)
     this.renderFormList()
   }
 
   private previewForm(id: string): void {
     const form = this.forms.find((form) => form.id === id)
     if (form) {
+      const lastResponse = StorageManager.getLastResponse(form.id)
       Renderer.renderFormPreview(
         form,
         (formData) => this.handleFormSubmit(formData),
         () => this.renderFormList(),
+        lastResponse,
       )
     }
   }
@@ -198,7 +207,6 @@ class FormBuilder {
     }
   }
 
-
   private handleFormSubmit(formData: FormData): void {
     if (!this.currentForm) return
 
@@ -215,9 +223,19 @@ class FormBuilder {
         response.data[field.id] = formData.get(field.id) as string
       }
     })
+
+    StorageManager.saveResponse(response)
     console.log("Form submitted:", response)
     Renderer.showMessage("Form submitted successfully!")
-    this.renderFormList()
+    this.previewForm(this.currentForm.id) // Refresh the preview
+  }
+
+  private viewResponses(formId: string): void {
+    const form = this.forms.find((f) => f.id === formId)
+    if (!form) return
+
+    const responses = StorageManager.getResponses(formId)
+    Renderer.renderResponsesList(form, responses, () => this.renderFormList())
   }
 
   private saveForm(): void {
@@ -228,6 +246,7 @@ class FormBuilder {
       } else {
         this.forms.push(this.currentForm)
       }
+      StorageManager.saveForms(this.forms)
       Renderer.showMessage("Form saved successfully!")
       this.renderFormList()
     }
@@ -241,4 +260,3 @@ class FormBuilder {
 
 // Initialize the application
 new FormBuilder()
-
